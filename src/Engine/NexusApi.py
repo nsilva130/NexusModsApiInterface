@@ -258,5 +258,31 @@ class NexusApi:
         # Return the response
         return response
     
+    ################################
+    # 
+    # Internal methods
+    # For use only within the NexusApi class
+    # 
+    ################################
     
+    def _isStr(input) -> bool:
+        """Test if a given variable is a string (str) 
+
+        Args:
+            input (any): The variable to test
+
+        Returns:
+            bool: True if the input is a string.
+        """
+        return isinstance(input,str)
     
+    def _isInt(input) -> bool:
+        """Test if a given variable is a integer (int) 
+
+        Args:
+            input (any): The variable to test
+
+        Returns:
+            bool: True if the input is an integer.
+        """
+        return isinstance(input,int)
