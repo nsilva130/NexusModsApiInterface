@@ -2,7 +2,7 @@
 
 import sys
 
-from dependencies.NexusApi import NexusApi
+from Engine.NexusApi import NexusApi
 
 # The function to be executed at runtime
 def main():
