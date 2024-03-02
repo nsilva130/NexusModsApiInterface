@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
 import sys
-
-from Engine.NexusApi import NexusApi
+from Engine import NexusApi
 
 # The function to be executed at runtime
 def main():
