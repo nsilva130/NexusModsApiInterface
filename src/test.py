@@ -13,13 +13,12 @@ import webbrowser
 
 # The function to be executed at runtime
 def main():
-    
-    
     # Initialize API interface
     # Request API Key from user
     apiKey = input("Enter API Access Key: ")
     nexusMods = NexusApi(apiKey)
     
+    # Game to search for mods
     gameDomain = "baldursgate3"
     
     
@@ -47,7 +46,15 @@ def main():
         for mod in inputModList:
             modIdList.append(mod["id"])
     else:
-        print("Filename '" + fileName + "' not found.")
+        print("Filename '" + fileName + "' not found!")
+        # If original mod list cannot be found, prompt user for input
+        continueOnFileNotFound = InputManager.falsyBooleanInput("Continue script (y/*)? ", "y")
+        # If the user wants to continue
+        if (continueOnFileNotFound):
+            print("Continuing script!")
+        else:
+            print("Stopping script!")
+            return
     
     # Get count of original mods
     inputCount = len(modIdList)
@@ -175,7 +182,7 @@ def main():
                     
                 
             if (batchUpdate and (len(batchLinks) > 0) ):
-                print("Opening " + str(len(batchLinks)) + " mod pages! This may take a minute...")
+                print("Opening " + str(len(batchLinks)) + " mod page(s)! This may take a minute...")
                 for link in batchLinks:
                     webbrowser.open(link)
                     time.sleep(0.5)
