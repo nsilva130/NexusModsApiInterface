@@ -133,7 +133,7 @@ def main():
     
     
     if (len(updatesRequired) > 0):
-        print(str(len(updatesRequired)) + " mods flagged for updates!")
+        print(str(len(updatesRequired)) + " mod(s) flagged for updates!")
         # If the mods should be checked for updates. 
         # Boolean. Will default to "False" on invalid input
         addressUpdates = InputManager.falsyBooleanInput("Address updates (y/*)? ", "y")
@@ -232,7 +232,7 @@ def main():
             outputFilePath = Path(outputFileDirectory + outputFileName + " (" + str(index) + ")" + fileExtension)
     
     
-    print("Saving data as '"+ outputFileName + " (" + str(index) + ")" + fileExtension +"'")
+    print("Saving data as '"+ str(outputFilePath) +"'")
     
     # Save output contents
     with open(outputFilePath, 'w', encoding='utf-8') as f:
