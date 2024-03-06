@@ -5,10 +5,11 @@ from Engine import NexusApi
 from Engine import InputManager
 
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 import io
 from pathlib import Path
+import webbrowser
 
 # The function to be executed at runtime
 def main():
@@ -89,7 +90,6 @@ def main():
         outputMod["updatedTimestamp"] = getModJson["updated_timestamp"]
         outputMod["updatedTime"] = getModJson["updated_time"]
         outputMod["url"] = "https://www.nexusmods.com/"+gameDomain+"/mods/"+str(modId)
-        outputModList.append(outputMod)
         
         
         # Compare updatedTimestamp and lastUpdated timestamps
@@ -101,7 +101,11 @@ def main():
                 print("modId="+ str(modId) +" doesn't have lastDownloaded, flagging for update!")
                 updatesRequired.append(index)
             else:
-                lastDownloadedTime = datetime.fromisoformat(inputModList[index]["lastDownloaded"])
+                # Copy old download timestamp
+                outputMod["lastDownloaded"] = inputModList[index]["lastDownloaded"]
+                
+                # Process timestamps
+                lastDownloadedTime = datetime.fromisoformat(outputMod["lastDownloaded"])
                 lastUpdatedTime = datetime.fromisoformat(outputMod["updatedTime"])
                 
                 # Change lastUpdatedTime to match lastDownloaded timezone
@@ -117,7 +121,7 @@ def main():
             print("modId="+ str(modId) +" is new mod, flagging for update!")
             updatesRequired.append(index)
         
-        
+        outputModList.append(outputMod)
         time.sleep(0.1)
     
     
@@ -129,10 +133,60 @@ def main():
         
         # If positive input received
         if (addressUpdates):
-            print(addressUpdates)
+            
+            batchUpdate = InputManager.falsyBooleanInput("Open links en masse (y/*, will open all at once)? ", "y")
+            batchLinks = []
+            
+            timeNow = datetime.now().astimezone(timezone.utc).isoformat(timespec='microseconds')
+            # For each index flagged, address updates individually
+            for index in updatesRequired:
+                # Assemble mod info for use
+                modName = outputModList[index]["name"]
+                modId = outputModList[index]["id"]
+                modUrl = outputModList[index]["url"]
+                modUpdatedTime = outputModList[index]["updatedTime"]
+                modLastDownloaded = outputModList[index]["lastDownloaded"]
+                modIsNew = (not (index < inputCount))
+                
+                # Print mod info
+                print("\nMod Name: " + str(modName))
+                print("Mod ID: " + str(modId))
+                print("URL: " + str(modUrl))
+                print("Mod is new: " + str(modIsNew))
+                print("Repo Updated: " + str(modUpdatedTime))
+                print("Last Downloaded: " + str(modLastDownloaded))
+                
+                # Ask if you want to address this specific update
+                addressModUpdate = InputManager.falsyBooleanInput("Open modpage (y/*)? ", "y")
+                if (addressModUpdate):
+                    # If batch links are enabled, add to list of links to open
+                    if (batchUpdate):
+                        batchLinks.append(modUrl)
+                    else:
+                        # Open the mod individually and prompt for input when done
+                        webbrowser.open(modUrl)
+                        # Wait for user input before proceeding
+                        input("Press enter/return when ready to continue...")
+                
+                # Ask if you want to update lastDownloaded to current time
+                addLastDownloaded = InputManager.falsyBooleanInput("Add current time as lastDownloaded (y/*)? ", "y")
+                if (addLastDownloaded):
+                    outputModList[index]["lastDownloaded"] = timeNow
+                    
+                
+            if (batchUpdate and (len(batchLinks) > 0) ):
+                print("Opening " + str(len(batchLinks)) + " mod pages! This may take a minute...")
+                for link in batchLinks:
+                    webbrowser.open(link)
+                    time.sleep(0.5)
+                
+                print("Finished opening " + str(len(batchLinks)) + " mod pages!")
+            
+            
+            print("Finished addressing updates!")
         else:
             # Negative input was received
-            print(addressUpdates)
+            print("Ignoring updates!")
     
     
     
@@ -146,6 +200,12 @@ def main():
     
     # Generate new file name
     outputFileName = fileName
+    
+    newFileName = InputManager.falsyBooleanInput("New file name (y/*)? ", "y")
+    
+    if (newFileName):
+        outputFileName = input("Enter new file name: ")
+    
     
     # Remove file extension if it exists
     if (outputFileName[-len(fileExtension):] == fileExtension):
