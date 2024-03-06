@@ -24,7 +24,7 @@ def main():
     
     # Test if file exists
     fileName = input("Enter mod list json file name: ")
-    fileDirectory = "src/ModLists/"
+    fileDirectory = "ModLists/"
     fileExtension = ".json"
     filePath = Path(fileDirectory + fileName)
     if (fileName[-len(fileExtension):] != fileExtension):
@@ -207,6 +207,11 @@ def main():
     
     # Generate new file name
     outputFileName = fileName
+    # If outputFileName is empty/None, use "data" as default fileName
+    if (not outputFileName):
+        print("Empty fileName provided, using default 'data'!")
+        outputFileName = "data"
+        
     
     newFileName = InputManager.falsyBooleanInput("New file name (y/*)? ", "y")
     
