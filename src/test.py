@@ -1,29 +1,31 @@
 #!/usr/bin/env python
 
-import sys
 from Engine import NexusApi
 from Engine import InputManager
 
 import time
 from datetime import datetime, timezone
 import json
-import io
 from pathlib import Path
 import webbrowser
 
 # The function to be executed at runtime
 def main():
+    # Initialize pause constant
+    pauseTime = 0.1
+    
     # Initialize API interface
     # Request API Key from user
     apiKey = input("Enter API Access Key: ")
+    time.sleep(pauseTime)
     nexusMods = NexusApi(apiKey)
     
     # Game to search for mods
     gameDomain = "baldursgate3"
     
-    
     # Test if file exists
     fileName = input("Enter mod list json file name: ")
+    time.sleep(pauseTime)
     fileDirectory = "ModLists/"
     fileExtension = ".json"
     filePath = Path(fileDirectory + fileName)
@@ -49,6 +51,7 @@ def main():
         print("Filename '" + fileName + "' not found!")
         # If original mod list cannot be found, prompt user for input
         continueOnFileNotFound = InputManager.falsyBooleanInput("Continue script (y/*)? ", "y")
+        time.sleep(pauseTime)
         # If the user wants to continue
         if (continueOnFileNotFound):
             print("Continuing script!")
@@ -87,14 +90,13 @@ def main():
     # Check all modIds on NexusMods while tracking index
     for index,modId in enumerate(modIdList):
         print("Checking modId="+str(modId) + " (mod #" + str(index+1) + "/" + str(totalMods) + ")")
-        outputMod = {"name": None,"id": None,"updatedTimestamp": None,"updatedTime":None,"lastDownloaded":None,"url":None}
+        outputMod = {"name": None,"id": None,"updatedTime":None,"lastDownloaded":None,"url":None}
         getMod = nexusMods.getMod(game=gameDomain,id=modId)
         getModJson = getMod.json()
         
         # Assemble Mod Info
         outputMod["name"] = getModJson["name"]
         outputMod["id"] = modId
-        outputMod["updatedTimestamp"] = getModJson["updated_timestamp"]
         outputMod["updatedTime"] = getModJson["updated_time"]
         outputMod["url"] = "https://www.nexusmods.com/"+gameDomain+"/mods/"+str(modId)
         
@@ -121,7 +123,7 @@ def main():
                 
                 # Compare the times to determine if an update occured since lastDownloaded
                 if (lastDownloadedTime < lastUpdatedTime):
-                    print("modId="+ str(modId) +" has updated since lastDownloaded, flagging for update!")
+                    print("modId="+ str(modId) +" hasn't updated since lastDownloaded, but the mod page has been. Flagging for update!")
                     updatesRequired.append(index)
         else:
             # Mod is new, needs to initialize update
@@ -137,11 +139,13 @@ def main():
         # If the mods should be checked for updates. 
         # Boolean. Will default to "False" on invalid input
         addressUpdates = InputManager.falsyBooleanInput("Address updates (y/*)? ", "y")
+        time.sleep(pauseTime)
         
         # If positive input received
         if (addressUpdates):
             
             batchUpdate = InputManager.falsyBooleanInput("Open links en masse (y/*, will open all at once)? ", "y")
+            time.sleep(pauseTime)
             batchLinks = []
             
             timeNow = datetime.now().astimezone(timezone.utc).isoformat(timespec='microseconds')
@@ -165,6 +169,7 @@ def main():
                 
                 # Ask if you want to address this specific update
                 addressModUpdate = InputManager.falsyBooleanInput("Open modpage (y/*)? ", "y")
+                time.sleep(pauseTime)
                 if (addressModUpdate):
                     # If batch links are enabled, add to list of links to open
                     if (batchUpdate):
@@ -174,9 +179,11 @@ def main():
                         webbrowser.open(modUrl)
                         # Wait for user input before proceeding
                         input("Press enter/return when ready to continue...")
+                        time.sleep(pauseTime)
                 
                 # Ask if you want to update lastDownloaded to current time
                 addLastDownloaded = InputManager.falsyBooleanInput("Add current time as lastDownloaded (y/*)? ", "y")
+                time.sleep(pauseTime)
                 if (addLastDownloaded):
                     outputModList[index]["lastDownloaded"] = timeNow
                     
@@ -214,9 +221,11 @@ def main():
         
     
     newFileName = InputManager.falsyBooleanInput("New file name (y/*)? ", "y")
+    time.sleep(pauseTime)
     
     if (newFileName):
         outputFileName = input("Enter new file name: ")
+        time.sleep(pauseTime)
     
     
     # Remove file extension if it exists
