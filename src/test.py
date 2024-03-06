@@ -13,6 +13,8 @@ from pathlib import Path
 # The function to be executed at runtime
 def main():
     
+    
+    # Initialize API interface
     # Request API Key from user
     apiKey = input("Enter API Access Key: ")
     nexusMods = NexusApi(apiKey)
@@ -72,8 +74,11 @@ def main():
     outputModList = []
     updatesRequired = []
     
+    totalMods = len(modIdList)
+    
+    # Check all modIds on NexusMods while tracking index
     for index,modId in enumerate(modIdList):
-        print("Checking modId="+str(modId))
+        print("Checking modId="+str(modId) + " (mod #" + str(index+1) + "/" + str(totalMods) + ")")
         outputMod = {"name": None,"id": None,"updatedTimestamp": None,"updatedTime":None,"lastDownloaded":None,"url":None}
         getMod = nexusMods.getMod(game=gameDomain,id=modId)
         getModJson = getMod.json()
@@ -86,9 +91,10 @@ def main():
         outputMod["url"] = "https://www.nexusmods.com/"+gameDomain+"/mods/"+str(modId)
         outputModList.append(outputMod)
         
+        
         # Compare updatedTimestamp and lastUpdated timestamps
         
-        # If it is before the end of the original list, check. Else, automatically add to update list
+        # If it is before the end of the original list, run standard check. Else, automatically add to flagged update list
         if (index < inputCount):
             # If it doesn't have a timestamp, default to adding it to the list
             if (not inputModList[index]["lastDownloaded"]):
@@ -108,22 +114,35 @@ def main():
                     updatesRequired.append(index)
         else:
             # Mod is new, needs to initialize update
+            print("modId="+ str(modId) +" is new mod, flagging for update!")
             updatesRequired.append(index)
         
         
         time.sleep(0.1)
     
     
-    # addressUpdates = InputManager.falsyBooleanInput("Address updates (y/*)? ", "y")
+    if (len(updatesRequired) > 0):
+        print(str(len(updatesRequired)) + " mods flagged for updates!")
+        # If the mods should be checked for updates. 
+        # Boolean. Will default to "False" on invalid input
+        addressUpdates = InputManager.falsyBooleanInput("Address updates (y/*)? ", "y")
+        
+        # If positive input received
+        if (addressUpdates):
+            print(addressUpdates)
+        else:
+            # Negative input was received
+            print(addressUpdates)
     
     
     
     
-    # Print final result
+    
+    
+    # Print final outputModList result
     print(outputModList)
     
     # Save to file
-    
     
     # Generate new file name
     outputFileName = fileName
@@ -139,14 +158,14 @@ def main():
     
     # If the output file name already exists, increase increment until new file name is reached
     if Path.exists(outputFilePath):
-        print(outputFileName + " already exists!")
+        print(outputFileName + fileExtension + " already exists!")
         index = 0
         while Path.exists(outputFilePath):
             index += 1
-            outputFilePath = Path(outputFileDirectory + outputFileName + "(" + str(index) + ") " + fileExtension)
+            outputFilePath = Path(outputFileDirectory + outputFileName + " (" + str(index) + ")" + fileExtension)
     
     
-    print("Saving data as '"+ outputFileName +"'")
+    print("Saving data as '"+ outputFileName + " (" + str(index) + ")" + fileExtension +"'")
     
     # Save output contents
     with open(outputFilePath, 'w', encoding='utf-8') as f:
