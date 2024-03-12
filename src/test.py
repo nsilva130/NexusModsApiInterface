@@ -25,7 +25,7 @@ def main():
     # CONFIG: Change the following to alter the execution of the script.
     
     # New mods. Add ID of each new mod(s) here and they will be added to the list of mods to grab (if they aren't there already)
-    addModIdList = [754,2370,6282,6960,2404,7134,1746,2967]
+    addModIdList = [754,2370,6282,6960,2404,1746,2967]
     
     # The game to search for mod.
     # This is the name that is used in the URL when viewing mods in your browser, e.g. https://www.nexusmods.com/baldursgate3/mods/####
