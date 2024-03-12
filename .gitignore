@@ -159,3 +159,7 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 src/apikey.txt
+# Exclude all the contents of the ModLists folder
+ModLists/*
+# Keep the folder structure
+!ModLists/Results/.gitkeep
