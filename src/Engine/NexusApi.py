@@ -267,6 +267,74 @@ class NexusApi:
         # Return the response
         return copy.deepcopy(self._lastResponse)
     
+    def endorseMod(self,game:str,id:int):
+        """Sends a request to endorse a specific mod on the server.
+
+        Args:
+            game (str): The game domain to use when polling Nexus Mods (e.g. "baldursgate3").
+            id (int): The mod ID to get.
+
+        Raises:
+            Exception: If the game domain provided is not a string (str) or has length = 0.
+            Exception: If the mod ID is not >0.
+
+        Returns:
+            Response: The response information received from the API.
+        """
+        
+        # Validate the game domain string (DOES NOT GUARANTEE VALID RESPONSE)
+        if (not isinstance(game,str)):
+            raise Exception("Valid game domain not provided. Game value must be string (str).")
+        if (game == ""):
+            raise Exception("Valid game domain not provided. Game cannot be empty string (len = 0).")
+        
+        if ((not isinstance(id,int)) and id <= 0):
+            raise Exception("Valid mod ID not provided. Mod ID must be value >0")
+        
+        # Prepare API request
+        request_url = self._api_url + "v1/games/" + game + "/mods/"+ str(id) +"/endorse.json"
+        request_headers = { "accept": "application/json" , "apikey": self._apiKey}
+        
+        # Send API request
+        self._lastResponse = requests.post(request_url, headers=request_headers)
+        
+        # Return the response
+        return copy.deepcopy(self._lastResponse)
+    
+    def abstainMod(self,game:str,id:int):
+        """Sends a request to abstain endorsing a specific mod on the server.
+
+        Args:
+            game (str): The game domain to use when polling Nexus Mods (e.g. "baldursgate3").
+            id (int): The mod ID to get.
+
+        Raises:
+            Exception: If the game domain provided is not a string (str) or has length = 0.
+            Exception: If the mod ID is not >0.
+
+        Returns:
+            Response: The response information received from the API.
+        """
+        
+        # Validate the game domain string (DOES NOT GUARANTEE VALID RESPONSE)
+        if (not isinstance(game,str)):
+            raise Exception("Valid game domain not provided. Game value must be string (str).")
+        if (game == ""):
+            raise Exception("Valid game domain not provided. Game cannot be empty string (len = 0).")
+        
+        if ((not isinstance(id,int)) and id <= 0):
+            raise Exception("Valid mod ID not provided. Mod ID must be value >0")
+        
+        # Prepare API request
+        request_url = self._api_url + "v1/games/" + game + "/mods/"+ str(id) +"/abstain.json"
+        request_headers = { "accept": "application/json" , "apikey": self._apiKey}
+        
+        # Send API request
+        self._lastResponse = requests.post(request_url, headers=request_headers)
+        
+        # Return the response
+        return copy.deepcopy(self._lastResponse)
+    
     
     ################################
     # 
