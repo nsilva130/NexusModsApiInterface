@@ -1,6 +1,7 @@
 # NexusApi.py
 
 # Imports Required Dependencies
+import copy
 import requests
 import json
 
@@ -16,7 +17,7 @@ class NexusApi:
     _api_url = "https://api.nexusmods.com/"
     
     def __init__(self, apiKey: str):
-        """Initialize Nexus Mods API interface.
+        """Create a new NexusApi object using the specified API Key
 
         Args:
             apiKey (str): The API access key to interract with Nexus Mods.
@@ -47,13 +48,63 @@ class NexusApi:
             raise Exception("Validation response error. Response code = " + str(validation_response_code) + ", JSON: " + str(validation_response.json()))
         
         self._apiKey = apiKey
+        self._lastResponse = None
+        
+    def getLastResponse(self) -> requests.Response:
+        """Retrieve a copy of the last response obtained from the API.
+        
+        Creates a deep copy of the original response so that it is not alterred accidentally.
+
+        Returns:
+            Response: The response last returned by the API
+        """
+        return copy.deepcopy(self._lastResponse)
+    
+    def setApiKey(self,apiKey: str):
+        """Set a new API key for the NexusApi object.
+        
+        This otherwise followes the same validation process as the NexusApi.__init__() method.
+
+        Args:
+            apiKey (str): The API access key to interract with Nexus Mods.
+
+        Raises:
+            Exception: If apiKey is not a string (str) or has length = 0.
+            Exception: If API key fails validation response.
+            
+        Returns:
+            Response: A reference to the NexusApi object
+        """
+        
+        # Validate apiKey is a non-empty string
+        if (not isinstance(apiKey,str)):
+            raise Exception("Valid API key not provided. API key value must be string (str).")
+        if (apiKey == ""):
+            raise Exception("Valid API key not provided. Game cannot be empty string (len = 0).")
+        
+        
+        # Prepare validation API key request
+        validation_url = self._api_url + "v1/users/validate.json"
+        validation_headers = { "accept": "application/json" , "apikey": apiKey}
+        validation_response = requests.get(validation_url, headers=validation_headers)
+        
+        # Send validation API key request
+        validation_response_code = validation_response.status_code
+        
+        # Check if the response was invalid
+        if validation_response_code != 200:
+            # If not response code 200, apiKey is invalid
+            raise Exception("Validation response error. Response code = " + str(validation_response_code) + ", JSON: " + str(validation_response.json()))
+        
+        
+        self._apiKey = apiKey
+        
+        return self
 
 
     ################################
-    # 
     # Mods
     # Mod specific routes (E.g. retreiving latest mods, endorsing a mod)
-    # 
     ################################
     
     def getUpdated(self,game:str,time = "1w"):
@@ -86,10 +137,10 @@ class NexusApi:
         request_headers = { "accept": "application/json" , "apikey": self._apiKey}
         
         # Send API request
-        response: requests.Response = requests.get(request_url, headers=request_headers)
+        self._lastResponse = requests.get(request_url, headers=request_headers)
         
         # Return the response
-        return response
+        return copy.deepcopy(self._lastResponse)
     
     
     def getLatestAdded(self,game:str):
@@ -116,10 +167,10 @@ class NexusApi:
         request_headers = { "accept": "application/json" , "apikey": self._apiKey}
         
         # Send API request
-        response: requests.Response = requests.get(request_url, headers=request_headers)
+        self._lastResponse = requests.get(request_url, headers=request_headers)
         
         # Return the response
-        return response
+        return copy.deepcopy(self._lastResponse)
     
     
     def getLatestUpdated(self,game:str):
@@ -146,10 +197,10 @@ class NexusApi:
         request_headers = { "accept": "application/json" , "apikey": self._apiKey}
         
         # Send API request
-        response: requests.Response = requests.get(request_url, headers=request_headers)
+        self._lastResponse = requests.get(request_url, headers=request_headers)
         
         # Return the response
-        return response
+        return copy.deepcopy(self._lastResponse)
     
     
     def getTrending(self,game:str):
@@ -176,10 +227,10 @@ class NexusApi:
         request_headers = { "accept": "application/json" , "apikey": self._apiKey}
         
         # Send API request
-        response: requests.Response = requests.get(request_url, headers=request_headers)
+        self._lastResponse = requests.get(request_url, headers=request_headers)
         
         # Return the response
-        return response
+        return copy.deepcopy(self._lastResponse)
     
     
     def getMod(self,game:str,id:int):
@@ -211,10 +262,10 @@ class NexusApi:
         request_headers = { "accept": "application/json" , "apikey": self._apiKey}
         
         # Send API request
-        response: requests.Response = requests.get(request_url, headers=request_headers)
+        self._lastResponse = requests.get(request_url, headers=request_headers)
         
         # Return the response
-        return response
+        return copy.deepcopy(self._lastResponse)
     
     
     ################################
@@ -253,10 +304,10 @@ class NexusApi:
         request_headers = { "accept": "application/json" , "apikey": self._apiKey}
         
         # Send API request
-        response: requests.Response = requests.get(request_url, headers=request_headers)
+        self._lastResponse = requests.get(request_url, headers=request_headers)
         
         # Return the response
-        return response
+        return copy.deepcopy(self._lastResponse)
     
     ################################
     # 
