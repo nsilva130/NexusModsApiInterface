@@ -27,7 +27,7 @@ def main():
     # CONFIG: Change the following to alter the execution of the script.
     
     # New mods. Add ID of each new mod(s) here and they will be added to the list of mods to grab (if they aren't there already)
-    addModIdList = [754,2370,6282,6960,2404,1746,2967]
+    addModIdList = [2700,858,3940]
     
     # The game to search for mod.
     # This is the name that is used in the URL when viewing mods in your browser, e.g. https://www.nexusmods.com/baldursgate3/mods/####
@@ -45,6 +45,13 @@ def main():
     
     # REST OF THE FRACKING SCRIPT. DO NOT TOUCH!
     
+    # Initialize directories
+    fileDirectory = "ModLists/"
+    outputFileDirectory = fileDirectory + "Results/"
+    outputDirectoryPath = Path(outputFileDirectory)
+    # If the required directories don't exist, make them
+    outputDirectoryPath.mkdir(parents=True, exist_ok=True)
+    
     # Initialize API interface
     # Request API Key from user
     apiKey = input("Enter API Access Key: ")
@@ -60,7 +67,6 @@ def main():
         print("Blank file name provided! Using default name '"+ defaultFileName + "'")
         fileName = defaultFileName
     
-    fileDirectory = "ModLists/"
     fileExtension = ".json"
     filePath = Path(fileDirectory + fileName)
     if (fileName[-len(fileExtension):] != fileExtension):
@@ -257,7 +263,6 @@ def main():
         outputFileName = outputFileName[:-len(fileExtension)]
         
     # Generate default output file path
-    outputFileDirectory = fileDirectory + "Results/"
     outputFilePath = Path(outputFileDirectory + outputFileName + fileExtension)
     
     

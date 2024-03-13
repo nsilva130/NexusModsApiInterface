@@ -161,5 +161,3 @@ cython_debug/
 src/apikey.txt
 # Exclude all the contents of the ModLists folder
 ModLists/*
-# Keep the folder structure
-!ModLists/Results/.gitkeep
