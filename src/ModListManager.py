@@ -8,6 +8,16 @@ import json
 from pathlib import Path
 import webbrowser
 
+
+# Initialize logger
+import logging
+dateFormat = '%Y-%m-%d %H:%M:%S'
+logFormat = '[%(asctime)s.%(msecs)03d] %(name)s (%(levelname)s): %(msg)s'
+log = logging.getLogger("ModListManager")
+logging.basicConfig(format=logFormat,datefmt=dateFormat)
+# Log Level = INFO
+log.setLevel(logging.INFO)
+
 # The function to be executed at runtime
 def main():
     
@@ -37,7 +47,7 @@ def main():
     pauseTime = 0.1
     
     # Default mod file name. If none is provided during the script, this is the name that gets used.
-    defaultFileName = "data"
+    defaultFileName = "data.json"
 
     # END OF CONFIG
     
@@ -45,6 +55,9 @@ def main():
     
     # REST OF THE FRACKING SCRIPT. DO NOT TOUCH!
     
+    log.info("Beggining ModListManager.py script")
+    
+    log.info("Initializing \".\\ModLists\\\" and \".\\ModLists\\Results\\\" directories.")
     # Initialize directories
     fileDirectory = "ModLists/"
     outputFileDirectory = fileDirectory + "Results/"
@@ -54,23 +67,26 @@ def main():
     
     # Initialize API interface
     # Request API Key from user
-    apiKey = input("Enter API Access Key: ")
+    log.info("Requesting Nexus Mods API access key.")
+    apiKey = InputManager.basicInput("Enter API Access Key: ")
     time.sleep(pauseTime)
+    
+    log.info("Initializing NexusApi interface.")
     nexusMods = NexusApi(apiKey)
     
     # Test if file exists
-    fileName = input("Enter mod list json file name: ")
+    fileName = InputManager.basicInput("Enter mod list json file name: ")
     time.sleep(pauseTime)
     
     # Check if file name is provided, if none is provided it will switch to the default
     if (not fileName):
-        print("Blank file name provided! Using default name '"+ defaultFileName + "'")
+        log.info("Blank file name provided! Using default name \"{0}\"".format(defaultFileName))
         fileName = defaultFileName
     
     fileExtension = ".json"
     filePath = Path(fileDirectory + fileName)
     if (fileName[-len(fileExtension):] != fileExtension):
-        print("File name "+ fileName + " missing extension. Appending '.json' to end.")
+        log.info("File name \"{0}\" missing extension. Appending '.json' to end.".format(fileName))
         filePath = Path(fileDirectory + fileName + fileExtension)
     
     
@@ -82,41 +98,43 @@ def main():
     if Path.exists(filePath):
         f = open(filePath)
         inputModList = json.load(f)
-        print("Loaded File '" + fileName + "' successfully!")
-        print("File Contents: " + json.dumps(inputModList))
+        log.info("Loaded File \"{0}\" successfully!".format(fileName))
+        log.info("{0}:\n{1}".format(fileName,json.dumps(inputModList)))
         f.close()
         for mod in inputModList:
             modIdList.append(mod["id"])
     else:
-        print("Filename '" + fileName + "' not found!")
+        log.warning("Filename \"{0}\" not found!".format(fileName))
         # If original mod list cannot be found, prompt user for input
         continueOnFileNotFound = InputManager.falsyBooleanInput("Continue script (y/*)? ", "y")
         time.sleep(pauseTime)
         # If the user wants to continue
         if (continueOnFileNotFound):
-            print("Continuing script!")
+            log.info("Continuing script!")
         else:
-            print("Stopping script!")
+            log.warning("Stopping script!")
             return
     
     # Get count of original mods
     inputCount = len(modIdList)
     
+    
     # check additional mod IDs and add if missing
     for modId in addModIdList:
         if not modId in modIdList:
             modIdList.append(modId)
-            print("Added modId " + str(modId) + " to list.")
+            log.info("Added modId {0} to list.".format(modId))
         else:
-            print("ModId " + str(modId) + " already in loaded file, ignoring!")
+            log.warning("ModId {0} already in loaded file, ignoring!".format(modId))
     
-    print("List of modIds to check: " + str(modIdList))
+    log.info("List of modId's to check: {0}".format(modIdList))
     
     outputModList = []
     updatesRequired = []
     
     totalMods = len(modIdList)
-    
+    newMods = totalMods-inputCount
+    log.info("Mod counts:\n\tExisting Mods = {0},\n\tNew Mods = {1},\n\tTotal Mods = {2}".format(inputCount,newMods,totalMods))
     
     # Mod Info format
     # mod = {"name": "ABC123","id": 123,"updatedTime": "YYYY-MM-DDTHH:MM:SS.SSS+TZ","lastDownloaded":"YYYY-MM-DDTHH:MM:SS.SSS+TZ","url":"https://www.nexusmods.com/gameDomain/mods/modId"}
@@ -124,7 +142,7 @@ def main():
     
     # Check all modIds on NexusMods while tracking index
     for index,modId in enumerate(modIdList):
-        print("Checking modId="+str(modId) + " (mod #" + str(index+1) + "/" + str(totalMods) + ")")
+        log.info("Checking modId={0} (mod #{1}/{2})".format(modId,(index+1),totalMods))
         outputMod = {"name": None,"id": None,"updatedTime":None,"lastDownloaded":None,"url":None}
         getMod = nexusMods.getMod(game=gameDomain,id=modId)
         getModJson = getMod.json()
@@ -142,7 +160,7 @@ def main():
         if (index < inputCount):
             # If it doesn't have a timestamp, default to adding it to the list
             if (not inputModList[index]["lastDownloaded"]):
-                print("modId="+ str(modId) +" doesn't have lastDownloaded, flagging for update!")
+                log.warning("modId={0} doesn't have lastDownloaded, flagging for update!".format(modId))
                 updatesRequired.append(index)
             else:
                 # Copy old download timestamp
@@ -158,19 +176,19 @@ def main():
                 
                 # Compare the times to determine if an update occured since lastDownloaded
                 if (lastDownloadedTime < lastUpdatedTime):
-                    print("modId="+ str(modId) +" hasn't updated since lastDownloaded, but the mod page has been. Flagging for update!")
+                    log.warning("modId={0} hasn't updated since lastDownloaded, but the mod page has. Flagging for update!".format(modId))
                     updatesRequired.append(index)
         else:
             # Mod is new, needs to initialize update
-            print("modId="+ str(modId) +" is new mod, flagging for update!")
+            log.warning("modId={0} is a new mod, flagging for update!".format(modId))
             updatesRequired.append(index)
         
         outputModList.append(outputMod)
         time.sleep(0.1)
     
-    
-    if (len(updatesRequired) > 0):
-        print(str(len(updatesRequired)) + " mod(s) flagged for updates!")
+    updateCount = len(updatesRequired)
+    if (updateCount > 0):
+        log.warning("{0} mod(s) flagged for updates!".format(updateCount))
         # If the mods should be checked for updates. 
         # Boolean. Will default to "False" on invalid input
         addressUpdates = InputManager.falsyBooleanInput("Address updates (y/*)? ", "y")
@@ -194,13 +212,8 @@ def main():
                 modLastDownloaded = outputModList[index]["lastDownloaded"]
                 modIsNew = (not (index < inputCount))
                 
-                # Print mod info
-                print("\nMod Name: " + str(modName))
-                print("Mod ID: " + str(modId))
-                print("URL: " + str(modUrl))
-                print("Mod is new: " + str(modIsNew))
-                print("Repo Updated: " + str(modUpdatedTime))
-                print("Last Downloaded: " + str(modLastDownloaded))
+                # Log mod info
+                log.info("Mod #{0}/{1} \n\tName: {2}\n\tID: {3}\n\tURL: {4}\n\tIs new mod: {5}\n\tMod Page Updated: {6}\n\tLast Downloaded: {7}\n".format((index+1),updateCount,modName,modId,modUrl,modIsNew,modUpdatedTime,modLastDownloaded))
                 
                 # Ask if you want to address this specific update
                 addressModUpdate = InputManager.falsyBooleanInput("Open modpage (y/*)? ", "y")
@@ -222,28 +235,28 @@ def main():
                 if (addLastDownloaded):
                     outputModList[index]["lastDownloaded"] = timeNow
                     
-                
-            if (batchUpdate and (len(batchLinks) > 0) ):
-                print("Opening " + str(len(batchLinks)) + " mod page(s)! This may take a minute...")
+                batchCount = len(batchLinks)
+            if (batchUpdate and (batchCount > 0) ):
+                log.warning("Opening {0} mod page(s)! This may take a minute...".format(batchCount))
                 for link in batchLinks:
                     webbrowser.open(link)
                     time.sleep(0.5)
                 
-                print("Finished opening " + str(len(batchLinks)) + " mod pages!")
+                log.info("Finished opening {0} mod pages!".format(batchCount))
             
-            
-            print("Finished addressing updates!")
+            log.info("Finished addressing all {0} updates!".format(updateCount))
         else:
             # Negative input was received
-            print("Ignoring updates!")
+            log.info("Ignoring updates!")
     
     
     
     
     
     
-    # Print final outputModList result
-    print(outputModList)
+    # Log final outputModList result
+    log.info("Output Mod List:\n{0}".format(outputModList))
+    
     
     # Save to file
     
@@ -254,7 +267,7 @@ def main():
     time.sleep(pauseTime)
     
     if (newFileName):
-        outputFileName = input("Enter new file name: ")
+        outputFileName = InputManager.basicInput("Enter new file name: ")
         time.sleep(pauseTime)
     
     
@@ -268,14 +281,14 @@ def main():
     
     # If the output file name already exists, increase increment until new file name is reached
     if Path.exists(outputFilePath):
-        print(outputFileName + fileExtension + " already exists!")
+        log.warning("{0}{1} already exists!".format(outputFileName,fileExtension))
         index = 0
         while Path.exists(outputFilePath):
             index += 1
             outputFilePath = Path(outputFileDirectory + outputFileName + " (" + str(index) + ")" + fileExtension)
     
     
-    print("Saving data as '"+ str(outputFilePath) +"'")
+    log.info("Saving mod list as \"{0}\"".format(outputFilePath))
     
     # Save output contents
     with open(outputFilePath, 'w', encoding='utf-8') as f:
