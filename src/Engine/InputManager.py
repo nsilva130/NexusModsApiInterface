@@ -91,8 +91,7 @@ class InputManager():
         # Log inputs
         log.debug("Arg(s) received:\n\tprompt = \"{0}\",\n\tpositive = \"{1}\",\n\tignoreCase = \"{2}\"".format(prompt,positive,ignoreCase))
         positiveResponse = positive
-        log.info(prompt)
-        userInput = input()
+        userInput = input(prompt)
         # Log userInput
         log.debug("Received user input:\n\tuserInput = \"{0}\"".format(userInput))
         
