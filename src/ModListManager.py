@@ -226,7 +226,7 @@ def main():
                         # Open the mod individually and prompt for input when done
                         webbrowser.open(modUrl)
                         # Wait for user input before proceeding
-                        input("Press enter/return when ready to continue...")
+                        InputManager.waitInput("Press enter/return when ready to continue...")
                         time.sleep(pauseTime)
                 
                 # Ask if you want to update lastDownloaded to current time

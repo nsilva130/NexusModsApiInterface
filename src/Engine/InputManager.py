@@ -29,6 +29,11 @@ class InputManager():
         return userInput
     
     def waitInput(prompt = "Press enter to continue...") -> None:
+        """Pauses the script to await further input from the user.
+
+        Args:
+            prompt (str, optional): The prompt to provide the user. Defaults to "Press enter to continue...".
+        """
         log.debug("Arg(s) received: \n\tprompt = \"{0}\"".format(prompt))
         input(prompt)
         log.debug("waitInput() passed.")
