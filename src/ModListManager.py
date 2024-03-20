@@ -203,7 +203,7 @@ def main():
             
             timeNow = datetime.now().astimezone(timezone.utc).isoformat(timespec='microseconds')
             # For each index flagged, address updates individually
-            for index in updatesRequired:
+            for i,index in enumerate(updatesRequired):
                 # Assemble mod info for use
                 modName = outputModList[index]["name"]
                 modId = outputModList[index]["id"]
@@ -213,7 +213,7 @@ def main():
                 modIsNew = (not (index < inputCount))
                 
                 # Log mod info
-                log.info("Mod #{0}/{1} \n\tName: {2}\n\tID: {3}\n\tURL: {4}\n\tIs new mod: {5}\n\tMod Page Updated: {6}\n\tLast Downloaded: {7}\n".format((index+1),updateCount,modName,modId,modUrl,modIsNew,modUpdatedTime,modLastDownloaded))
+                log.info("Mod #{0}/{1} \n\tName: {2}\n\tID: {3}\n\tURL: {4}\n\tIs new mod: {5}\n\tMod Page Updated: {6}\n\tLast Downloaded: {7}\n".format((i+1),updateCount,modName,modId,modUrl,modIsNew,modUpdatedTime,modLastDownloaded))
                 
                 # Ask if you want to address this specific update
                 addressModUpdate = InputManager.falsyBooleanInput("Open modpage (y/*)? ", "y")
