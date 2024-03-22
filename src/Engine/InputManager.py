@@ -23,7 +23,8 @@ class InputManager():
         """
         
         log.debug("Arg(s) received: \n\tprompt = \"{0}\"".format(prompt))
-        userInput = input(prompt)
+        log.info(prompt)
+        userInput = input()
         log.debug("Received user input: \n\tuserInput = \"{0}\"".format(userInput))
         log.debug("Returning userInput = \"{0}\"".format(userInput))
         return userInput
@@ -35,7 +36,8 @@ class InputManager():
             prompt (str, optional): The prompt to provide the user. Defaults to "Press enter to continue...".
         """
         log.debug("Arg(s) received: \n\tprompt = \"{0}\"".format(prompt))
-        input(prompt)
+        log.info(prompt)
+        userInput = input()
         log.debug("waitInput() passed.")
         return
     
@@ -57,7 +59,8 @@ class InputManager():
         
         # Log inputs
         log.debug("Arg(s) received:\n\tprompt = \"{0}\",\n\tpositive = \"{1}\",\n\tnegative = \"{2}\",\n\tignoreCase = \"{3}\"".format(prompt,positive,negative,ignoreCase))
-        userInput = input(prompt)
+        log.info(prompt)
+        userInput = input()
         # Log userInput
         log.debug("Received user input:\n\tuserInput = \"{0}\"".format(userInput))
         if (ignoreCase):
@@ -91,7 +94,8 @@ class InputManager():
         # Log inputs
         log.debug("Arg(s) received:\n\tprompt = \"{0}\",\n\tpositive = \"{1}\",\n\tignoreCase = \"{2}\"".format(prompt,positive,ignoreCase))
         positiveResponse = positive
-        userInput = input(prompt)
+        log.info(prompt)
+        userInput = input()
         # Log userInput
         log.debug("Received user input:\n\tuserInput = \"{0}\"".format(userInput))
         
@@ -123,7 +127,8 @@ class InputManager():
         
         log.debug("Arg(s) received:\n\tprompt = \"{0}\",\n\negative = \"{1}\",\n\tignoreCase = \"{2}\"".format(prompt,negative,ignoreCase))
         negativeResponse = negative
-        userInput = input(prompt)
+        log.info(prompt)
+        userInput = input()
         # Log userInput
         log.debug("Received user input:\n\tuserInput = \"{0}\"".format(userInput))
         
