@@ -213,7 +213,7 @@ def main():
                 modIsNew = (not (index < inputCount))
                 
                 # Log mod info
-                log.info("Mod #{0}/{1} \n\tName: {2}\n\tID: {3}\n\tURL: {4}\n\tIs new mod: {5}\n\tMod Page Updated: {6}\n\tLast Downloaded: {7}\n".format((i+1),updateCount,modName,modId,modUrl,modIsNew,modUpdatedTime,modLastDownloaded))
+                log.info("Mod Update #{0}/{1} \n\tName: {2}\n\tID: {3}\n\tURL: {4}\n\tIs new mod: {5}\n\tMod Page Updated: {6}\n\tLast Downloaded: {7}\n".format((i+1),updateCount,modName,modId,modUrl,modIsNew,modUpdatedTime,modLastDownloaded))
                 
                 # Ask if you want to address this specific update
                 addressModUpdate = InputManager.falsyBooleanInput("Open modpage (y/*)? ", "y")
